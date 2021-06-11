@@ -61,7 +61,7 @@ Stimuli images displayed to the subject during the experiment are not available 
 
 The shell script `download.sh` will download all data we need, which takes around 6 hours to run. Depending on the network connection, some data would be lost halfway, so it is necessary to do a sanity check. If everything works well, f-MRI data of the same run should be similar in size (within less than 1 MB of deviation). **Caveat**: in the training set, session 07 has 4 runs, session 08 and 09 each has 10 runs, this may be caused by unexpected issues during the experiment, so we have to manually fix it.
 
-![images](result/download.png)
+![images](download.png)
 
 <details>
 <summary>View code</summary>
@@ -245,7 +245,7 @@ In [afni](), we can easily verify that all runs all now co-registered into the s
 
 ![image](1.png)
 
-![image](result/2.png)
+![image](2.png)
 
 
 
@@ -348,7 +348,7 @@ To train a model that can effectively decode image features from the f-MRI bold 
 
 There are several choices to pick from such as AlexNet and ResNet, but here we are using the keras implementation of [VGG19](https://keras.io/api/applications/vgg/), which won the ImageNet Challenge in 2014. This model consists of 16 convolutional layers and 3 fully connected layers, it was pre-trained with images on [ImageNet](http://www.image-net.org/) to classify images into 1,000 object categories.
 
-![image](result/vgg_architecture.png)
+![image](vgg_architecture.png)
 
 As a fixed feature extractor, we wrap VGG19 into an `Extractor` class and write an `extract()` method. Once we create an instance of it, we can iteratively extract features on every image. In VGG19, all visual images were resized to 224x224 pixels and fed to the model. Since objects may be more suitably represented using high-level visual features which are invariant to image differences caused by translation or rotation, we discard the 3 fully connected layers and the softmax linear classifier, only take the output from the last convolutional layer (after downsampling in the max pooling layer), thus, the dimension of the original data space will be reduced to a new feature space of shape `(7, 7, 512)`, while the high-level features are mostly reserved. We then flatten this feature array into a vector as well.
 
@@ -683,11 +683,11 @@ I'm not able to run the code above with only 8GB memory on my laptop, any attemp
 
 To evaluate the quality of our prediction, the feature values of some random unit across images are visualized in the figures below, and we measure feature decoding accuracy as the Pearson correlation coefficient between the prediction and true feature in that unit. (a better way would be to plot all correlations as a function of unit and use the average correlation as evaluation metric) The result is not perfect but somewhat reasonable, there are a lot of fluctuations along the horizontal axis because the true feature contains too many zeros, so that only some of the randomly selected 1,500 units carry rich information of the image features. The correlation on letter images is 0.9927, which is too optimistic given that we only have 10 data points (10 letter images for test).
 
-![image](result/test.png)
+![image](test.png)
 
-![image](result/artificial.png)
+![image](artificial.png)
 
-![image](result/letter.png)
+![image](letter.png)
 
 Overall, the result falls short of our expectation, I've tried other versions of regression models but none of them makes much of a difference. It took me a while to realize what went wrong after comparing my work to the original author's sample code, here's the outcome.
 
@@ -708,7 +708,7 @@ The algorithm requires an Caffe implementation of VGG19 to run, one must correct
 
 Given the decoded features of a 224x224x3 image of a leopard, the generated image after every 10 updates are drawn below. At first the image is hardly recognizable, but after several iterations some clear features of an animal start to emerge. On the last row, we can find a lot similarities between the reconstructed image and the ground truth. Here I'm only using features from the last convolutional layer, but the original code uses all layers from VGG19, which seems to produce better result.
 
-![image](result/icnn.png)
+![image](icnn.png)
 
 
 
