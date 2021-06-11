@@ -243,7 +243,7 @@ done
 
 In [afni](), we can easily verify that all runs all now co-registered into the same space.
 
-![image](result/1.png)
+![image](1.png)
 
 ![image](result/2.png)
 
